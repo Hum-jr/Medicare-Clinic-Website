@@ -1,0 +1,169 @@
+@model ClinicApp.ViewModels.BookAppointmentViewModel
+@{
+    ViewData["Title"] = "Book Appointment";
+}
+
+<div class="bg-light py-4 mb-4">
+    <div class="container">
+        <h1 class="fw-bold mb-0"><i class="fa fa-calendar-plus me-2 text-primary"></i>Book Appointment</h1>
+        <p class="text-muted mb-0">Choose a doctor, date, and time</p>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <form asp-action="Book" method="post" id="bookForm">
+                        @Html.AntiForgeryToken()
+                        <div asp-validation-summary="All" class="alert alert-danger small"></div>
+
+                        <!-- Doctor -->
+                        <div class="mb-4">
+                            <label asp-for="DoctorId" class="form-label fw-semibold fs-5">
+                                <i class="fa fa-user-md me-1 text-primary"></i>Select Doctor
+                            </label>
+                            <select asp-for="DoctorId" class="form-select form-select-lg" id="doctorSelect">
+                                <option value="">-- Choose a doctor --</option>
+                                @foreach (var doc in Model.AvailableDoctors)
+                                {
+                                    <option value="@doc.Id" selected="@(Model.DoctorId == doc.Id)">
+                                        @doc.FullName – @doc.Specialty ($@doc.ConsultationFee)
+                                    </option>
+                                }
+                            </select>
+                            <span asp-validation-for="DoctorId" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Date -->
+                        <div class="mb-4">
+                            <label asp-for="AppointmentDate" class="form-label fw-semibold fs-5">
+                                <i class="fa fa-calendar me-1 text-primary"></i>Select Date
+                            </label>
+                            <input asp-for="AppointmentDate" type="date" class="form-control form-control-lg"
+                                   id="dateInput"
+                                   min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")"
+                                   max="@DateTime.Today.AddMonths(2).ToString("yyyy-MM-dd")" />
+                            <span asp-validation-for="AppointmentDate" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Time Slots -->
+                        <div class="mb-4">
+                            <label class="form-label fw-semibold fs-5">
+                                <i class="fa fa-clock me-1 text-primary"></i>Select Time
+                            </label>
+                            <div id="slotsContainer">
+                                <p class="text-muted">Select a doctor and date to see available slots.</p>
+                            </div>
+                            <input type="hidden" asp-for="SelectedTimeSlot" id="selectedSlot" />
+                            <span asp-validation-for="SelectedTimeSlot" class="text-danger small"></span>
+                        </div>
+
+                        <!-- Reason -->
+                        <div class="mb-4">
+                            <label asp-for="ReasonForVisit" class="form-label fw-semibold fs-5">
+                                <i class="fa fa-notes-medical me-1 text-primary"></i>Reason for Visit
+                            </label>
+                            <textarea asp-for="ReasonForVisit" class="form-control" rows="3"
+                                      placeholder="Briefly describe your symptoms or reason..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-lg w-100 fw-semibold">
+                            <i class="fa fa-calendar-check me-2"></i>Confirm Booking
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Panel -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm mb-3" id="doctorInfo" style="display:none!important">
+                <div class="card-body p-4 text-center">
+                    <i class="fa fa-user-doctor fa-3x text-primary mb-3"></i>
+                    <h5 class="fw-bold" id="infoName"></h5>
+                    <p class="text-primary mb-1" id="infoSpec"></p>
+                    <p class="text-muted small" id="infoExp"></p>
+                    <hr />
+                    <p class="fw-bold text-success fs-5" id="infoFee"></p>
+                </div>
+            </div>
+            <div class="card border-0 shadow-sm bg-primary text-white">
+                <div class="card-body p-4">
+                    <h6 class="fw-bold mb-3"><i class="fa fa-info-circle me-2"></i>How It Works</h6>
+                    <ol class="small mb-0 ps-3">
+                        <li class="mb-2">Choose your preferred doctor</li>
+                        <li class="mb-2">Pick an available date</li>
+                        <li class="mb-2">Select a time slot</li>
+                        <li>Confirm your booking</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    const doctors = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AvailableDoctors));
+    const doctorSelect = document.getElementById('doctorSelect');
+    const dateInput = document.getElementById('dateInput');
+    const slotsContainer = document.getElementById('slotsContainer');
+    const selectedSlotInput = document.getElementById('selectedSlot');
+
+    function loadSlots() {
+        const doctorId = doctorSelect.value;
+        const date = dateInput.value;
+        if (!doctorId || !date) return;
+
+        slotsContainer.innerHTML = '<div class="spinner-border spinner-border-sm text-primary"></div> Loading slots...';
+
+        fetch(`/Appointments/GetTimeSlots?doctorId=${doctorId}&date=${date}`)
+            .then(r => r.json())
+            .then(slots => {
+                if (slots.length === 0) {
+                    slotsContainer.innerHTML = '<p class="text-warning"><i class="fa fa-exclamation-triangle me-1"></i>No available slots on this date.</p>';
+                    return;
+                }
+                slotsContainer.innerHTML = '<div class="d-flex flex-wrap gap-2">' +
+                    slots.map(s => `<button type="button" class="btn btn-outline-primary slot-btn" data-slot="${s}">${s}</button>`).join('') +
+                    '</div>';
+                document.querySelectorAll('.slot-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('active', 'btn-primary'));
+                        this.classList.add('active', 'btn-primary');
+                        this.classList.remove('btn-outline-primary');
+                        selectedSlotInput.value = this.dataset.slot;
+                    });
+                });
+                // Re-select if already chosen
+                if (selectedSlotInput.value) {
+                    const existing = document.querySelector(`.slot-btn[data-slot="${selectedSlotInput.value}"]`);
+                    if (existing) existing.click();
+                }
+            });
+    }
+
+    function updateDoctorInfo() {
+        const id = parseInt(doctorSelect.value);
+        const doc = doctors.find(d => d.id === id);
+        const panel = document.getElementById('doctorInfo');
+        if (doc) {
+            document.getElementById('infoName').textContent = doc.fullName;
+            document.getElementById('infoSpec').textContent = doc.specialty;
+            document.getElementById('infoExp').textContent = doc.yearsOfExperience + ' years experience';
+            document.getElementById('infoFee').textContent = '$' + doc.consultationFee + ' / visit';
+            panel.style.display = 'block';
+        } else {
+            panel.style.display = 'none';
+        }
+    }
+
+    doctorSelect.addEventListener('change', () => { updateDoctorInfo(); loadSlots(); });
+    dateInput.addEventListener('change', loadSlots);
+
+    // Init
+    if (doctorSelect.value) { updateDoctorInfo(); if (dateInput.value) loadSlots(); }
+</script>
+}

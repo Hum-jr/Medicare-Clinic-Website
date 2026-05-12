@@ -1,0 +1,123 @@
+@model ClinicApp.ViewModels.HomeViewModel
+@{
+    ViewData["Title"] = "Home";
+}
+
+<!-- Hero -->
+<section class="hero-section text-white d-flex align-items-center">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-3">Your Health Is Our <span class="text-warning">Priority</span></h1>
+                <p class="lead mb-4">Book appointments with top specialists easily. Quality healthcare, just a click away.</p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a asp-controller="Appointments" asp-action="Book" class="btn btn-warning btn-lg fw-semibold px-4">
+                        <i class="fa fa-calendar-plus me-2"></i>Book Appointment
+                    </a>
+                    <a asp-controller="Home" asp-action="Doctors" class="btn btn-outline-light btn-lg px-4">
+                        <i class="fa fa-user-md me-2"></i>Find a Doctor
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center d-none d-lg-block">
+                <i class="fa-solid fa-hospital hero-icon"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats -->
+<section class="stats-section py-4 bg-white shadow-sm">
+    <div class="container">
+        <div class="row text-center g-4">
+            <div class="col-md-4">
+                <div class="stat-box">
+                    <h2 class="display-5 fw-bold text-primary">@Model.TotalDoctors+</h2>
+                    <p class="text-muted mb-0"><i class="fa fa-user-md me-1"></i>Expert Doctors</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-box">
+                    <h2 class="display-5 fw-bold text-success">@Model.TotalPatients+</h2>
+                    <p class="text-muted mb-0"><i class="fa fa-users me-1"></i>Happy Patients</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-box">
+                    <h2 class="display-5 fw-bold text-warning">@Model.TotalAppointments+</h2>
+                    <p class="text-muted mb-0"><i class="fa fa-calendar-check me-1"></i>Appointments Done</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Specialties -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center fw-bold mb-2">Our Specialties</h2>
+        <p class="text-center text-muted mb-5">Find the right specialist for your needs</p>
+        <div class="row g-4 justify-content-center">
+            @foreach (var spec in Model.Specialties)
+            {
+                <div class="col-6 col-md-4 col-lg-2">
+                    <a asp-controller="Home" asp-action="Doctors" asp-route-specialtyId="@spec.Id"
+                       class="text-decoration-none">
+                        <div class="specialty-card text-center p-3 rounded-3 bg-white shadow-sm h-100">
+                            <div class="specialty-icon mb-2">
+                                <i class="fa-solid @(spec.IconClass ?? "fa-stethoscope") fa-2x text-primary"></i>
+                            </div>
+                            <p class="fw-semibold mb-0 small">@spec.Name</p>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Featured Doctors -->
+<section class="py-5">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="fw-bold mb-1">Meet Our Doctors</h2>
+                <p class="text-muted mb-0">Experienced professionals dedicated to your care</p>
+            </div>
+            <a asp-controller="Home" asp-action="Doctors" class="btn btn-outline-primary">View All</a>
+        </div>
+        <div class="row g-4">
+            @foreach (var doctor in Model.FeaturedDoctors)
+            {
+                <div class="col-md-6 col-lg-3">
+                    <div class="card doctor-card h-100 border-0 shadow-sm">
+                        <div class="card-body text-center p-4">
+                            <div class="doctor-avatar mb-3">
+                                <i class="fa fa-user-doctor fa-3x text-primary"></i>
+                            </div>
+                            <h5 class="fw-bold mb-1">@doctor.FullName</h5>
+                            <p class="text-primary small mb-2">@doctor.Specialty</p>
+                            <p class="text-muted small mb-3">@doctor.YearsOfExperience yrs experience</p>
+                            <p class="fw-semibold text-success mb-3">$@doctor.ConsultationFee / visit</p>
+                            <a asp-controller="Appointments" asp-action="Book" asp-route-doctorId="@doctor.Id"
+                               class="btn btn-primary btn-sm w-100">
+                                <i class="fa fa-calendar-plus me-1"></i>Book Now
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section py-5 text-white text-center">
+    <div class="container">
+        <h2 class="fw-bold mb-3">Ready to Get Started?</h2>
+        <p class="lead mb-4">Join thousands of patients who trust MediCare for their healthcare needs.</p>
+        <a asp-controller="Account" asp-action="Register" class="btn btn-warning btn-lg px-5 fw-semibold">
+            <i class="fa fa-user-plus me-2"></i>Create Free Account
+        </a>
+    </div>
+</section>

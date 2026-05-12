@@ -1,0 +1,113 @@
+@model ClinicApp.ViewModels.AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="bg-dark text-white py-4 mb-4">
+    <div class="container">
+        <h1 class="fw-bold mb-0"><i class="fa fa-gauge-high me-2"></i>Admin Dashboard</h1>
+        <p class="mb-0 opacity-75">System overview · @DateTime.Today.ToString("MMMM d, yyyy")</p>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <!-- Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm text-center p-4 h-100">
+                <i class="fa fa-users fa-2x text-primary mb-2"></i>
+                <h2 class="fw-bold">@Model.TotalPatients</h2>
+                <p class="text-muted mb-0 small">Total Patients</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm text-center p-4 h-100">
+                <i class="fa fa-user-doctor fa-2x text-success mb-2"></i>
+                <h2 class="fw-bold">@Model.TotalDoctors</h2>
+                <p class="text-muted mb-0 small">Active Doctors</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm text-center p-4 h-100">
+                <i class="fa fa-calendar-day fa-2x text-warning mb-2"></i>
+                <h2 class="fw-bold">@Model.TodayAppointments</h2>
+                <p class="text-muted mb-0 small">Today</p>
+            </div>
+        </div>
+        <div class="col-6 col-md-3">
+            <div class="card border-0 shadow-sm text-center p-4 h-100">
+                <i class="fa fa-circle-check fa-2x text-info mb-2"></i>
+                <h2 class="fw-bold">@Model.CompletedThisMonth</h2>
+                <p class="text-muted mb-0 small">Completed This Month</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Recent Appointments -->
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0">Recent Appointments</h5>
+                    <a asp-action="Appointments" class="btn btn-sm btn-outline-primary">View All</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Patient</th>
+                                <th>Doctor</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var a in Model.RecentAppointments)
+                            {
+                                <tr>
+                                    <td>@a.PatientName</td>
+                                    <td>@a.DoctorName</td>
+                                    <td>@a.AppointmentDate.ToString("MMM d")</td>
+                                    <td>
+                                        <span class="badge bg-@BadgeColor(a.Status)">@a.Status</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Doctors -->
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0">Doctors</h5>
+                    <a asp-action="CreateDoctor" class="btn btn-sm btn-success"><i class="fa fa-plus"></i></a>
+                </div>
+                <div class="list-group list-group-flush">
+                    @foreach (var doc in Model.Doctors)
+                    {
+                        <div class="list-group-item px-3 py-2">
+                            <div class="fw-semibold small">@doc.FullName</div>
+                            <div class="text-muted" style="font-size:0.78rem">@doc.Specialty</div>
+                        </div>
+                    }
+                </div>
+                <div class="card-footer text-center">
+                    <a asp-action="Doctors" class="btn btn-sm btn-outline-primary w-100">Manage Doctors</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    string BadgeColor(ClinicApp.Models.AppointmentStatus s) => s switch {
+        ClinicApp.Models.AppointmentStatus.Completed => "success",
+        ClinicApp.Models.AppointmentStatus.Cancelled => "danger",
+        ClinicApp.Models.AppointmentStatus.Confirmed => "primary",
+        _ => "warning"
+    };
+}

@@ -1,0 +1,72 @@
+@model List<ClinicApp.ViewModels.AppointmentDetailsViewModel>
+@{
+    ViewData["Title"] = "All Appointments";
+}
+
+<div class="bg-light py-4 mb-4">
+    <div class="container d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <h1 class="fw-bold mb-0"><i class="fa fa-calendar-alt me-2 text-primary"></i>All Appointments</h1>
+        <div class="d-flex gap-2 flex-wrap">
+            @foreach (var status in new[] { "", "Confirmed", "Completed", "Cancelled", "Pending" })
+            {
+                <a asp-action="Appointments" asp-route-status="@status"
+                   class="btn btn-sm @(ViewBag.CurrentStatus?.ToString() == status ? "btn-primary" : "btn-outline-secondary")">
+                    @(string.IsNullOrEmpty(status) ? "All" : status)
+                </a>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>#</th>
+                        <th>Patient</th>
+                        <th>Doctor</th>
+                        <th>Specialty</th>
+                        <th>Date & Time</th>
+                        <th>Fee</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var a in Model)
+                    {
+                        <tr>
+                            <td class="text-muted small">@a.Id</td>
+                            <td>@a.PatientName</td>
+                            <td>@a.DoctorName</td>
+                            <td><span class="badge bg-primary-subtle text-primary">@a.Specialty</span></td>
+                            <td class="small">
+                                @a.AppointmentDate.ToString("MMM d, yyyy")<br />
+                                <span class="text-muted">@a.StartTime.ToString(@"hh\:mm")</span>
+                            </td>
+                            <td class="text-success fw-semibold">$@a.ConsultationFee</td>
+                            <td><span class="badge bg-@BadgeColor(a.Status)">@a.Status</span></td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        @if (!Model.Any())
+        {
+            <div class="p-5 text-center text-muted">
+                <i class="fa fa-calendar-xmark fa-3x mb-3"></i>
+                <p>No appointments found.</p>
+            </div>
+        }
+    </div>
+</div>
+
+@functions {
+    string BadgeColor(ClinicApp.Models.AppointmentStatus s) => s switch {
+        ClinicApp.Models.AppointmentStatus.Completed => "success",
+        ClinicApp.Models.AppointmentStatus.Cancelled => "danger",
+        ClinicApp.Models.AppointmentStatus.Confirmed => "primary",
+        _ => "warning"
+    };
+}

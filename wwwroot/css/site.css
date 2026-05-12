@@ -1,0 +1,218 @@
+/* ── Imports ───────────────────────────────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+/* ── Variables ─────────────────────────────────────────────── */
+:root {
+    --clinic-blue: #1a6fd4;
+    --clinic-teal: #0d9488;
+    --clinic-light: #f0f7ff;
+    --clinic-dark: #0f172a;
+    --radius: 12px;
+}
+
+/* ── Base ──────────────────────────────────────────────────── */
+body {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    background: #f8fafc;
+    color: #1e293b;
+}
+
+/* ── Navbar ────────────────────────────────────────────────── */
+.clinic-navbar {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+    box-shadow: 0 2px 20px rgba(0,0,0,0.15);
+    padding: 0.75rem 0;
+}
+
+.clinic-navbar .nav-link {
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    padding: 0.5rem 0.9rem !important;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.clinic-navbar .nav-link:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+/* ── Hero ──────────────────────────────────────────────────── */
+.hero-section {
+    background: linear-gradient(135deg, #0f3460 0%, #1a6fd4 50%, #0d9488 100%);
+    min-height: 480px;
+    padding: 5rem 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 500px;
+    height: 500px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 50%;
+}
+
+.hero-icon {
+    font-size: 10rem;
+    opacity: 0.15;
+    color: white;
+}
+
+/* ── Stats ─────────────────────────────────────────────────── */
+.stats-section {
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.stat-box {
+    padding: 1rem;
+}
+
+/* ── Specialty Cards ───────────────────────────────────────── */
+.specialty-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 2px solid transparent;
+}
+
+.specialty-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(26,111,212,0.15) !important;
+    border-color: var(--clinic-blue);
+}
+
+/* ── Doctor Cards ──────────────────────────────────────────── */
+.doctor-card {
+    border-radius: var(--radius) !important;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.doctor-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.1) !important;
+}
+
+.doctor-avatar {
+    width: 70px;
+    height: 70px;
+    background: var(--clinic-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.doctor-avatar-sm {
+    width: 50px;
+    height: 50px;
+    background: var(--clinic-light);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* ── CTA Section ───────────────────────────────────────────── */
+.cta-section {
+    background: linear-gradient(135deg, #0f3460, #1a6fd4);
+}
+
+/* ── Appointment Cards ─────────────────────────────────────── */
+.appt-card {
+    border-radius: var(--radius) !important;
+    border-left: 4px solid transparent !important;
+    transition: box-shadow 0.2s;
+}
+
+.appt-card.upcoming {
+    border-left-color: var(--clinic-blue) !important;
+}
+
+.appt-card.past {
+    border-left-color: #94a3b8 !important;
+}
+
+.appt-card:hover {
+    box-shadow: 0 6px 20px rgba(0,0,0,0.08) !important;
+}
+
+/* ── Cards General ─────────────────────────────────────────── */
+.card {
+    border-radius: var(--radius) !important;
+}
+
+/* ── Badges ────────────────────────────────────────────────── */
+.bg-primary-subtle {
+    background-color: #dbeafe !important;
+}
+
+.bg-secondary-subtle {
+    background-color: #f1f5f9 !important;
+}
+
+/* ── Slot Buttons ──────────────────────────────────────────── */
+.slot-btn {
+    min-width: 80px;
+    font-weight: 600;
+    border-radius: 8px;
+}
+
+/* ── Footer ────────────────────────────────────────────────── */
+.clinic-footer {
+    background: #0f172a;
+    color: #94a3b8;
+}
+
+/* ── Min-height util ───────────────────────────────────────── */
+.min-vh-75 {
+    min-height: 75vh;
+}
+
+/* ── Table ─────────────────────────────────────────────────── */
+.table th {
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #64748b;
+}
+
+/* ── Buttons ───────────────────────────────────────────────── */
+.btn {
+    border-radius: 8px !important;
+    font-weight: 600;
+}
+
+.btn-primary {
+    background: var(--clinic-blue);
+    border-color: var(--clinic-blue);
+}
+
+.btn-primary:hover {
+    background: #1558b0;
+    border-color: #1558b0;
+}
+
+/* ── Form Controls ─────────────────────────────────────────── */
+.form-control, .form-select {
+    border-radius: 8px !important;
+    border-color: #e2e8f0;
+    padding: 0.6rem 0.9rem;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--clinic-blue);
+    box-shadow: 0 0 0 3px rgba(26, 111, 212, 0.1);
+}
+
+/* ── Input Group ───────────────────────────────────────────── */
+.input-group-text {
+    border-radius: 8px 0 0 8px !important;
+    background: #f1f5f9;
+    border-color: #e2e8f0;
+    color: #64748b;
+}

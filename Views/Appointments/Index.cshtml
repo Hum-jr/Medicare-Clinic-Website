@@ -1,0 +1,157 @@
+@model ClinicApp.ViewModels.AppointmentListViewModel
+@{
+    ViewData["Title"] = "My Appointments";
+}
+
+<div class="bg-light py-4 mb-4">
+    <div class="container d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="fw-bold mb-0"><i class="fa fa-calendar-check me-2 text-primary"></i>My Appointments</h1>
+            <p class="text-muted mb-0">Manage your upcoming and past appointments</p>
+        </div>
+        <a asp-action="Book" class="btn btn-primary">
+            <i class="fa fa-plus me-1"></i>Book New
+        </a>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <!-- Upcoming -->
+    <h4 class="fw-bold mb-3 text-primary"><i class="fa fa-clock me-2"></i>Upcoming (@Model.Upcoming.Count)</h4>
+
+    @if (!Model.Upcoming.Any())
+    {
+        <div class="card border-0 shadow-sm mb-4 p-4 text-center text-muted">
+            <i class="fa fa-calendar-xmark fa-3x mb-3"></i>
+            <p class="mb-2">No upcoming appointments.</p>
+            <a asp-action="Book" class="btn btn-primary btn-sm">Book Your First Appointment</a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-3 mb-5">
+            @foreach (var appt in Model.Upcoming)
+            {
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm appt-card upcoming">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h5 class="fw-bold mb-1">@appt.DoctorName</h5>
+                                    <span class="badge bg-primary-subtle text-primary">@appt.Specialty</span>
+                                </div>
+                                <span class="badge bg-@(appt.Status == ClinicApp.Models.AppointmentStatus.Confirmed ? "success" : "warning") fs-6">
+                                    @appt.Status
+                                </span>
+                            </div>
+                            <div class="text-muted small mt-3">
+                                <div><i class="fa fa-calendar me-2"></i>@appt.AppointmentDate.ToString("dddd, MMMM d, yyyy")</div>
+                                <div><i class="fa fa-clock me-2"></i>@appt.StartTime.ToString(@"hh\:mm") – @appt.EndTime.ToString(@"hh\:mm")</div>
+                                @if (!string.IsNullOrEmpty(appt.ReasonForVisit))
+                                {
+                                    <div><i class="fa fa-notes-medical me-2"></i>@appt.ReasonForVisit</div>
+                                }
+                                <div><i class="fa fa-dollar-sign me-2"></i>$@appt.ConsultationFee</div>
+                            </div>
+                            <div class="mt-3 d-flex gap-2">
+                                <a asp-action="Details" asp-route-id="@appt.Id" class="btn btn-outline-primary btn-sm">
+                                    <i class="fa fa-eye me-1"></i>Details
+                                </a>
+                                <button type="button" class="btn btn-outline-danger btn-sm"
+                                        data-bs-toggle="modal" data-bs-target="#cancelModal"
+                                        data-id="@appt.Id" data-doctor="@appt.DoctorName">
+                                    <i class="fa fa-times me-1"></i>Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- Past -->
+    <h4 class="fw-bold mb-3 text-secondary"><i class="fa fa-history me-2"></i>Past (@Model.Past.Count)</h4>
+
+    @if (!Model.Past.Any())
+    {
+        <p class="text-muted">No past appointments.</p>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var appt in Model.Past)
+            {
+                <div class="col-md-6">
+                    <div class="card border-0 shadow-sm appt-card past">
+                        <div class="card-body p-4">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h5 class="fw-bold mb-1">@appt.DoctorName</h5>
+                                    <span class="badge bg-secondary-subtle text-secondary">@appt.Specialty</span>
+                                </div>
+                                <span class="badge bg-@StatusBadge(appt.Status)">@appt.Status</span>
+                            </div>
+                            <div class="text-muted small mt-2">
+                                <div><i class="fa fa-calendar me-2"></i>@appt.AppointmentDate.ToString("MMMM d, yyyy")</div>
+                                <div><i class="fa fa-clock me-2"></i>@appt.StartTime.ToString(@"hh\:mm")</div>
+                            </div>
+                            @if (!string.IsNullOrEmpty(appt.DoctorNotes))
+                            {
+                                <div class="alert alert-light small mt-2 mb-0">
+                                    <strong>Doctor Notes:</strong> @appt.DoctorNotes
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<!-- Cancel Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cancel Appointment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="Cancel" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <input type="hidden" name="id" id="cancelId" />
+                    <p>Are you sure you want to cancel your appointment with <strong id="cancelDoctor"></strong>?</p>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Reason for cancellation (optional)</label>
+                        <textarea name="reason" class="form-control" rows="2"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Keep Appointment</button>
+                    <button type="submit" class="btn btn-danger">Cancel Appointment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    document.getElementById('cancelModal').addEventListener('show.bs.modal', function (e) {
+        var btn = e.relatedTarget;
+        document.getElementById('cancelId').value = btn.getAttribute('data-id');
+        document.getElementById('cancelDoctor').textContent = btn.getAttribute('data-doctor');
+    });
+</script>
+}
+
+@functions {
+    string StatusBadge(ClinicApp.Models.AppointmentStatus s) => s switch {
+        ClinicApp.Models.AppointmentStatus.Completed => "success",
+        ClinicApp.Models.AppointmentStatus.Cancelled => "danger",
+        ClinicApp.Models.AppointmentStatus.NoShow => "secondary",
+        _ => "warning"
+    };
+}

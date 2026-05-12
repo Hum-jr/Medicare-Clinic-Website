@@ -1,0 +1,83 @@
+@model List<ClinicApp.ViewModels.DoctorSummaryViewModel>
+@{
+    ViewData["Title"] = "Find a Doctor";
+    var specialties = ViewBag.Specialties as List<ClinicApp.Models.Specialty> ?? new();
+}
+
+<div class="bg-light py-4 mb-4">
+    <div class="container">
+        <h1 class="fw-bold mb-1"><i class="fa fa-user-md me-2 text-primary"></i>Find a Doctor</h1>
+        <p class="text-muted mb-0">Browse our team of specialists</p>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <!-- Search & Filter -->
+    <div class="card border-0 shadow-sm mb-4 p-3">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-5">
+                <label class="form-label fw-semibold">Search</label>
+                <input type="text" name="search" value="@ViewBag.Search" class="form-control" placeholder="Name or specialty..." />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Specialty</label>
+                <select name="specialtyId" class="form-select">
+                    <option value="">All Specialties</option>
+                    @foreach (var s in specialties)
+                    {
+                        <option value="@s.Id" selected="@(ViewBag.SelectedSpecialty?.ToString() == s.Id.ToString())">@s.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="fa fa-search me-1"></i>Search
+                </button>
+            </div>
+        </form>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="text-center py-5">
+            <i class="fa fa-user-slash fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">No doctors found</h4>
+            <a asp-controller="Home" asp-action="Doctors" class="btn btn-outline-primary mt-2">Clear Filters</a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var doc in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="card doctor-card h-100 border-0 shadow-sm">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="doctor-avatar-sm me-3">
+                                    <i class="fa fa-user-doctor fa-2x text-primary"></i>
+                                </div>
+                                <div>
+                                    <h5 class="fw-bold mb-0">@doc.FullName</h5>
+                                    <span class="badge bg-primary-subtle text-primary">@doc.Specialty</span>
+                                </div>
+                            </div>
+                            @if (!string.IsNullOrEmpty(doc.Bio))
+                            {
+                                <p class="text-muted small mb-3">@doc.Bio</p>
+                            }
+                            <div class="d-flex justify-content-between small text-muted mb-3">
+                                <span><i class="fa fa-clock me-1"></i>@doc.YearsOfExperience yrs exp</span>
+                                <span class="fw-semibold text-success">$@doc.ConsultationFee</span>
+                            </div>
+                            <a asp-controller="Appointments" asp-action="Book" asp-route-doctorId="@doc.Id"
+                               class="btn btn-primary w-100">
+                                <i class="fa fa-calendar-plus me-1"></i>Book Appointment
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

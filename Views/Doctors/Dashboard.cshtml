@@ -1,0 +1,125 @@
+@model ClinicApp.ViewModels.DoctorDashboardViewModel
+@{
+    ViewData["Title"] = "Doctor Dashboard";
+}
+
+<div class="bg-primary text-white py-4 mb-4">
+    <div class="container">
+        <h1 class="fw-bold mb-0">Good @(DateTime.Now.Hour < 12 ? "Morning" : "Afternoon"), Dr. @Model.DoctorName</h1>
+        <p class="mb-0 opacity-75">@Model.Specialty · @DateTime.Today.ToString("dddd, MMMM d, yyyy")</p>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <!-- Stats -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center p-4">
+                <i class="fa fa-calendar-day fa-2x text-primary mb-2"></i>
+                <h2 class="fw-bold">@Model.TodayAppointments.Count</h2>
+                <p class="text-muted mb-0">Today's Total</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center p-4">
+                <i class="fa fa-circle-check fa-2x text-success mb-2"></i>
+                <h2 class="fw-bold">@Model.CompletedToday</h2>
+                <p class="text-muted mb-0">Completed Today</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm text-center p-4">
+                <i class="fa fa-hourglass-half fa-2x text-warning mb-2"></i>
+                <h2 class="fw-bold">@Model.PendingToday</h2>
+                <p class="text-muted mb-0">Remaining Today</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Today's Schedule -->
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0"><i class="fa fa-list-check me-2 text-primary"></i>Today's Schedule</h5>
+                    <a asp-action="Schedule" class="btn btn-sm btn-outline-primary">Full Schedule</a>
+                </div>
+                <div class="card-body p-0">
+                    @if (!Model.TodayAppointments.Any())
+                    {
+                        <div class="p-4 text-center text-muted">
+                            <i class="fa fa-calendar-xmark fa-2x mb-2"></i>
+                            <p class="mb-0">No appointments today.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var a in Model.TodayAppointments.OrderBy(x => x.StartTime))
+                            {
+                                <div class="list-group-item px-4 py-3">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong>@a.PatientName</strong>
+                                            <div class="text-muted small">
+                                                <i class="fa fa-clock me-1"></i>@a.StartTime.ToString(@"hh\:mm") –
+                                                @if (!string.IsNullOrEmpty(a.ReasonForVisit))
+                                                {
+                                                    <span>@a.ReasonForVisit</span>
+                                                }
+                                            </div>
+                                        </div>
+                                        <div class="d-flex gap-2 align-items-center">
+                                            <span class="badge bg-@(a.Status == ClinicApp.Models.AppointmentStatus.Completed ? "success" : "primary")">
+                                                @a.Status
+                                            </span>
+                                            @if (a.Status != ClinicApp.Models.AppointmentStatus.Completed)
+                                            {
+                                                <form asp-action="MarkComplete" method="post">
+                                                    @Html.AntiForgeryToken()
+                                                    <input type="hidden" name="id" value="@a.Id" />
+                                                    <button class="btn btn-sm btn-success" title="Mark Complete">
+                                                        <i class="fa fa-check"></i>
+                                                    </button>
+                                                </form>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Upcoming -->
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom py-3">
+                    <h5 class="fw-bold mb-0"><i class="fa fa-forward me-2 text-info"></i>Upcoming</h5>
+                </div>
+                <div class="card-body p-0">
+                    @if (!Model.UpcomingAppointments.Any())
+                    {
+                        <div class="p-4 text-center text-muted"><p class="mb-0">No upcoming appointments.</p></div>
+                    }
+                    else
+                    {
+                        <div class="list-group list-group-flush">
+                            @foreach (var a in Model.UpcomingAppointments)
+                            {
+                                <div class="list-group-item px-4 py-3">
+                                    <strong class="d-block">@a.PatientName</strong>
+                                    <small class="text-muted">
+                                        @a.AppointmentDate.ToString("MMM d") · @a.StartTime.ToString(@"hh\:mm")
+                                    </small>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

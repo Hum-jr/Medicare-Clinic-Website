@@ -1,0 +1,43 @@
+@model List<ClinicApp.ViewModels.DoctorSummaryViewModel>
+@{
+    ViewData["Title"] = "Manage Doctors";
+}
+
+<div class="bg-light py-4 mb-4">
+    <div class="container d-flex justify-content-between align-items-center">
+        <h1 class="fw-bold mb-0"><i class="fa fa-user-doctor me-2 text-primary"></i>Manage Doctors</h1>
+        <a asp-action="CreateDoctor" class="btn btn-success">
+            <i class="fa fa-plus me-1"></i>Add Doctor
+        </a>
+    </div>
+</div>
+
+<div class="container pb-5">
+    <div class="row g-4">
+        @foreach (var doc in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body p-4 text-center">
+                        <i class="fa fa-user-doctor fa-3x text-primary mb-3"></i>
+                        <h5 class="fw-bold mb-1">@doc.FullName</h5>
+                        <span class="badge bg-primary mb-2">@doc.Specialty</span>
+                        <div class="text-muted small mb-3">
+                            <div>@doc.YearsOfExperience years experience</div>
+                            <div class="text-success fw-semibold">$@doc.ConsultationFee / visit</div>
+                            <div>@doc.TotalAppointments total appointments</div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light d-flex gap-2 justify-content-center p-3">
+                        <form asp-action="ToggleDoctorStatus" asp-route-id="@doc.Id" method="post">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-outline-warning">
+                                <i class="fa fa-toggle-on me-1"></i>Toggle Active
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
