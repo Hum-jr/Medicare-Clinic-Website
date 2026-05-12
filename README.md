@@ -145,3 +145,5 @@ ClinicApp/
 - **Repository-like pattern**: DbContext is injected into services via DI
 - **Role-based Authorization**: `[Authorize(Roles = "...")]` on all protected controllers
 - **Seeding**: `DbSeeder.cs` runs on startup to create demo data automatically
+# Medicare-Clinic-Website
+A class project made in ASP.NET
