@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # 🏥 MediCare – Clinic Appointment Management System
 
 An ASP.NET Core 8 MVC application for managing clinic appointments with role-based access for Patients, Doctors, and Admins.
@@ -146,7 +145,5 @@ ClinicApp/
 - **Repository-like pattern**: DbContext is injected into services via DI
 - **Role-based Authorization**: `[Authorize(Roles = "...")]` on all protected controllers
 - **Seeding**: `DbSeeder.cs` runs on startup to create demo data automatically
-=======
 # Medicare-Clinic-Website
 A class project made in ASP.NET
->>>>>>> d693f371fad0a116e48c53073d82d061e3622226
